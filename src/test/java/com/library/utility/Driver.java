@@ -1,4 +1,4 @@
-package com.library.utility;
+package com.libraryApp.utility;
 
 import io.github.bonigarcia.wdm.WebDriverManager;
 import org.openqa.selenium.WebDriver;
@@ -13,81 +13,72 @@ import java.net.URL;
 
 public class Driver {
 
-    private Driver() {}
+    private Driver() {
+    }
 
     private static InheritableThreadLocal<WebDriver> driverPool = new InheritableThreadLocal<>();
 
     public static WebDriver getDriver() {
 
         if (driverPool.get() == null) {
-            String browserName = System.getProperty("browser") != null
-                    ? System.getProperty("browser")
-                    : ConfigurationReader.getProperty("browser");
+            String browserName = System.getProperty("browser") != null ? System.getProperty("browser") : ConfigurationReader.getProperty("browser");
 
-            try {
-                switch (browserName) {
-                    case "remote-chrome":
-                        String gridAddress = "52.90.101.17";
-                        URL url = new URL("http://" + gridAddress + ":4444/wd/hub");
-                        DesiredCapabilities chromeCaps = new DesiredCapabilities();
-                        chromeCaps.setBrowserName("chrome");
-                        driverPool.set(new RemoteWebDriver(url, chromeCaps));
-                        break;
+            switch(browserName){
+                case "remote-chrome":
+                    try {
 
-                    case "remote-firefox":
-                        gridAddress = "52.90.101.17";
-                        url = new URL("http://" + gridAddress + ":4444/wd/hub");
-                        DesiredCapabilities firefoxCaps = new DesiredCapabilities();
-                        firefoxCaps.setBrowserName("firefox");
-                        driverPool.set(new RemoteWebDriver(url, firefoxCaps));
-                        break;
-
-                    case "chrome":
-                        WebDriverManager.chromedriver().setup();
+                        String gridAddress = "54.166.94.134";
+                        URL url = new URL("http://"+ gridAddress + ":4444/wd/hub");
                         ChromeOptions chromeOptions = new ChromeOptions();
+                        chromeOptions.addArguments("--start-maximized");
+                        driverPool.set(new RemoteWebDriver(url, chromeOptions));
+                        //driverPool.set(new RemoteWebDriver(new URL("http://0.0.0.0:4444/wd/hub"),desiredCapabilities));
 
-                        // Jenkins için headless mode
-                        if (isCI()) {
-                            chromeOptions.addArguments("--headless");
-                            chromeOptions.addArguments("--no-sandbox");
-                            chromeOptions.addArguments("--disable-dev-shm-usage");
-                            chromeOptions.addArguments("--disable-gpu");
-                        }
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                    break;
+                case "remote-firefox":
+                    try {
 
-                        driverPool.set(new ChromeDriver(chromeOptions));
-                        break;
+                        String gridAddress = "54.162.50.13";
+                        URL url = new URL("http://"+ gridAddress + ":4444/wd/hub");
+                        FirefoxOptions firefoxOptions=new FirefoxOptions();
+                        firefoxOptions.addArguments("--start-maximized");
+                        driverPool.set(new RemoteWebDriver(url, firefoxOptions));
+                        //driverPool.set(new RemoteWebDriver(new URL("http://0.0.0.0:4444/wd/hub"),desiredCapabilities));
 
-                    case "firefox":
-                        WebDriverManager.firefoxdriver().setup();
-                        FirefoxOptions firefoxOptions = new FirefoxOptions();
-
-                        if (isCI()) {
-                            firefoxOptions.addArguments("--headless");
-                        }
-
-                        driverPool.set(new FirefoxDriver(firefoxOptions));
-                        break;
-
-                    default:
-                        throw new RuntimeException("Unknown browser type: " + browserName);
-                }
-            } catch (Exception e) {
-                e.printStackTrace();
-                throw new RuntimeException("Failed to initialize WebDriver for: " + browserName, e);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                    break;
+                case "chrome":
+                    WebDriverManager.chromedriver().setup();
+                    driverPool.set(new ChromeDriver());
+                    driverPool.get().get(ConfigurationReader.getProperty("library_url"));
+                    break;
+                case "firefox":
+                    WebDriverManager.firefoxdriver().setup();
+                    driverPool.set(new FirefoxDriver());
+                    driverPool.get().get(ConfigurationReader.getProperty("library_url"));
+                    break;
             }
+
         }
 
         return driverPool.get();
+
     }
 
-    public static void closeDriver() {
-        if (driverPool.get() != null) {
-            driverPool.get().quit();
-            driverPool.remove();
+
+    public static void closeDriver(){
+        try {
+            if(driverPool.get() != null){
+                driverPool.get().quit();
+                driverPool.remove();
+            }
+        } catch (Exception e) {
+            System.out.println("An error occurred while closing the driver: " + e.getMessage());
         }
-    }
-
-    private static boolean isCI() {
-        return System.getenv("JENKINS_HOME") != null || System.getenv("CI") != null;
     }
 }
