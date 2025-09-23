@@ -44,7 +44,7 @@ public class BrowserUtil {
     /**
      * return a list of string from a list of elements
      *
-     * @param list of webelements
+     * @param list of web elements
      * @return list of string
      */
     public static List<String> getElementsText(List<WebElement> list) {
