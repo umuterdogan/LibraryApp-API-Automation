@@ -1,4 +1,4 @@
-package com.libraryApp.utility;
+package com.library.utility;
 
 import io.github.bonigarcia.wdm.WebDriverManager;
 import org.openqa.selenium.WebDriver;
@@ -6,7 +6,6 @@ import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.firefox.FirefoxDriver;
 import org.openqa.selenium.firefox.FirefoxOptions;
-import org.openqa.selenium.remote.DesiredCapabilities;
 import org.openqa.selenium.remote.RemoteWebDriver;
 
 import java.net.URL;
@@ -27,7 +26,7 @@ public class Driver {
                 case "remote-chrome":
                     try {
 
-                        String gridAddress = "54.166.94.134";
+                        String gridAddress = "52.90.101.17";
                         URL url = new URL("http://"+ gridAddress + ":4444/wd/hub");
                         ChromeOptions chromeOptions = new ChromeOptions();
                         chromeOptions.addArguments("--start-maximized");
@@ -41,7 +40,7 @@ public class Driver {
                 case "remote-firefox":
                     try {
 
-                        String gridAddress = "54.162.50.13";
+                        String gridAddress = "52.90.101.17";
                         URL url = new URL("http://"+ gridAddress + ":4444/wd/hub");
                         FirefoxOptions firefoxOptions=new FirefoxOptions();
                         firefoxOptions.addArguments("--start-maximized");
